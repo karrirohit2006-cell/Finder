@@ -1,0 +1,31 @@
+from backend.app.models.models import (
+    User,
+    CampusLocation,
+    LostReport,
+    FoundReport,
+    ItemImage,
+    ImageEmbedding,
+    RecoveryRequest,
+    Conversation,
+    Message,
+    Notification,
+    Feedback,
+    UserReport,
+    Block,
+)
+
+__all__ = [
+    "User",
+    "CampusLocation",
+    "LostReport",
+    "FoundReport",
+    "ItemImage",
+    "ImageEmbedding",
+    "RecoveryRequest",
+    "Conversation",
+    "Message",
+    "Notification",
+    "Feedback",
+    "UserReport",
+    "Block",
+]

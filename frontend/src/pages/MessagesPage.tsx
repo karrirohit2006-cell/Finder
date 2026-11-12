@@ -8,11 +8,14 @@ import {
   Check, 
   CheckCheck, 
   ShieldAlert,
-  Loader2
+  Loader2,
+  Lock,
+  RotateCcw
 } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { SafetyModal } from '../components/SafetyModal';
+import { EmptyState } from '../components/EmptyState';
 
 export const MessagesPage: React.FC = () => {
   const { user } = useAuth();
@@ -81,7 +84,7 @@ export const MessagesPage: React.FC = () => {
     try {
       const sent = await api.sendMessage(activeConvId, content);
       setMessages((prev) => [...prev, sent]);
-      fetchConvs(); // Update last message in sidebar
+      fetchConvs();
     } catch (err: any) {
       alert(err.message || 'Failed to deliver message.');
     } finally {
@@ -92,188 +95,200 @@ export const MessagesPage: React.FC = () => {
   const activeConv = conversations.find((c) => c.id === activeConvId);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-6">
       
-      {/* Title */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-          Private Campus Messaging
-        </h1>
-        <p className="text-xs text-slate-500">
-          Encrypted, authorized communication for accepted recovery requests.
-        </p>
+      {/* Title & Privacy Badge */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight flex items-center space-x-2">
+            <MessageSquare className="w-7 h-7 text-blue-600 dark:text-blue-400" />
+            <span>Private Campus Messaging</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            End-to-end authorized messaging between verified participants of accepted recovery requests.
+          </p>
+        </div>
+
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-300 text-xs font-bold self-start sm:self-auto">
+          <ShieldCheck className="w-4 h-4 text-emerald-500" />
+          <span>Role & Participant Verified</span>
+        </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden h-[75vh] flex">
-        
-        {/* Left Pane: Conversation List */}
-        <div className="w-full sm:w-80 md:w-96 border-r border-slate-200 flex flex-col h-full bg-slate-50/50">
-          <div className="p-4 border-b border-slate-200 bg-white">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Conversations ({conversations.length})
-            </span>
-          </div>
+      {isLoadingConvs ? (
+        <div className="h-[60vh] flex items-center justify-center text-slate-400 text-sm">
+          <div className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mr-3" />
+          <span>Loading conversations...</span>
+        </div>
+      ) : conversations.length === 0 ? (
+        <EmptyState
+          title="No Active Messaging Channels"
+          description="In-app messaging unlocks automatically once a recovery request is accepted by both participants."
+          actionText="View Recovery Requests"
+          onAction={() => window.location.href = '/recovery'}
+        />
+      ) : (
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[650px] max-h-[750px]">
+          
+          {/* Left Column: Conversation List */}
+          <div className="border-r border-slate-200 dark:border-slate-800 flex flex-col h-full bg-slate-50/50 dark:bg-slate-950/40">
+            <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Authorized Chats ({conversations.length})
+              </span>
+            </div>
 
-          <div className="flex-1 overflow-y-auto divide-y divide-slate-100">
-            {isLoadingConvs ? (
-              <div className="p-8 text-center text-xs text-slate-400">Loading chats...</div>
-            ) : conversations.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-400 space-y-2">
-                <MessageSquare className="w-8 h-8 text-slate-300 mx-auto" />
-                <p>No active conversations yet.</p>
-                <p className="text-[11px] text-slate-500">
-                  Chat unlocks automatically when a recovery request is accepted.
-                </p>
-              </div>
-            ) : (
-              conversations.map((c) => {
+            <div className="flex-1 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/60">
+              {conversations.map((c) => {
                 const isSelected = c.id === activeConvId;
                 return (
-                  <div
+                  <button
                     key={c.id}
                     onClick={() => setActiveConvId(c.id)}
-                    className={`p-4 transition cursor-pointer flex items-start space-x-3 ${
-                      isSelected ? 'bg-blue-50/80 border-l-4 border-blue-600' : 'hover:bg-slate-100/60'
+                    className={`w-full p-4 text-left transition flex items-start space-x-3 ${
+                      isSelected
+                        ? 'bg-blue-50/80 dark:bg-blue-950/40 border-l-4 border-blue-600'
+                        : 'hover:bg-slate-100 dark:hover:bg-slate-800/50'
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm shrink-0 uppercase shadow-sm">
-                      {c.partner_name.charAt(0)}
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-600 to-sky-400 text-white font-bold text-sm flex items-center justify-center shrink-0 shadow-sm">
+                      {c.partner_name ? c.partner_name.charAt(0) : 'U'}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-900 truncate">
+                        <span className="font-bold text-xs text-slate-900 dark:text-white truncate">
                           {c.partner_name}
                         </span>
-                        {c.unread_count > 0 && (
-                          <span className="px-1.5 py-0.2 text-[10px] font-bold bg-blue-600 text-white rounded-full">
-                            {c.unread_count}
-                          </span>
-                        )}
+                        <span className="text-[10px] text-slate-400">
+                          {c.last_message_at ? new Date(c.last_message_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                        </span>
                       </div>
-                      <span className="text-[11px] font-semibold text-blue-700 block truncate">
-                        {c.item_name}
-                      </span>
-                      <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                        {c.last_message ? c.last_message.content : 'No messages yet.'}
+                      <p className="text-[11px] font-mono text-blue-600 dark:text-blue-400 mt-0.5">
+                        {c.recovery_request_code}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
+                        {c.last_message_preview || 'No messages yet. Say hello!'}
                       </p>
                     </div>
-                  </div>
+                  </button>
                 );
-              })
-            )}
+              })}
+            </div>
           </div>
-        </div>
 
-        {/* Right Pane: Message Thread */}
-        <div className="hidden sm:flex flex-1 flex-col h-full bg-white">
-          {activeConv ? (
-            <>
-              {/* Header */}
-              <div className="p-4 border-b border-slate-200 flex items-center justify-between bg-white z-10">
-                <div className="flex items-center space-x-3">
-                  <div className="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm">
-                    {activeConv.partner_name.charAt(0)}
+          {/* Right Column: Chat Window */}
+          <div className="md:col-span-2 flex flex-col h-full bg-white dark:bg-slate-900">
+            {activeConv ? (
+              <>
+                {/* Active Chat Header */}
+                <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                      {activeConv.partner_name ? activeConv.partner_name.charAt(0) : 'U'}
+                    </div>
+                    <div>
+                      <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                        {activeConv.partner_name}
+                      </h3>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">
+                        Handshake: {activeConv.recovery_request_code}
+                      </span>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-sm leading-tight">
-                      {activeConv.partner_name}
-                    </h3>
-                    <span className="text-[11px] text-slate-500 capitalize">
-                      {activeConv.partner_type} • Re: {activeConv.item_name} ({activeConv.request_code})
-                    </span>
-                  </div>
-                </div>
 
-                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setIsSafetyOpen(true)}
-                    className="p-2 text-slate-400 hover:text-red-500 rounded-lg hover:bg-slate-100 transition"
-                    title="Report Conversation"
+                    className="p-2 rounded-xl text-slate-400 hover:text-amber-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+                    title="Safety & Moderation"
                   >
-                    <ShieldAlert className="w-4 h-4" />
+                    <ShieldAlert className="w-5 h-5 text-amber-500" />
                   </button>
                 </div>
-              </div>
 
-              {/* Chat Thread */}
-              <div className="flex-1 p-6 overflow-y-auto space-y-4 bg-slate-50/40">
-                <div className="text-center py-2">
-                  <span className="px-3 py-1 rounded-full bg-slate-200/60 text-[10px] text-slate-600 font-medium">
-                    🔒 Messages are protected and visible only to the two recovery participants.
-                  </span>
+                {/* Messages Body */}
+                <div className="flex-1 p-5 overflow-y-auto space-y-3.5 bg-slate-50/40 dark:bg-slate-950/30">
+                  {messages.length === 0 ? (
+                    <div className="h-full flex flex-col items-center justify-center text-center p-6 text-slate-400 text-xs space-y-2">
+                      <Lock className="w-8 h-8 text-slate-300 dark:text-slate-600" />
+                      <p className="font-bold text-slate-600 dark:text-slate-300">
+                        Private Handshake Conversation
+                      </p>
+                      <p className="max-w-xs">
+                        Use this secure chat to verify item markings, discuss campus drop-offs, and arrange a safe recovery meeting.
+                      </p>
+                    </div>
+                  ) : (
+                    messages.map((msg) => {
+                      const isMe = msg.sender_id === user?.id;
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+                        >
+                          <div
+                            className={`max-w-sm sm:max-w-md px-4 py-2.5 rounded-2xl text-xs leading-relaxed shadow-sm ${
+                              isMe
+                                ? 'bg-blue-600 text-white rounded-br-none'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-none border border-slate-200/80 dark:border-slate-700/80'
+                            }`}
+                          >
+                            <p className="whitespace-pre-wrap">{msg.content}</p>
+                          </div>
+                          <div className="flex items-center space-x-1 mt-1 text-[10px] text-slate-400 px-1">
+                            <span>
+                              {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            {isMe && (
+                              msg.is_read ? (
+                                <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                              ) : (
+                                <Check className="w-3.5 h-3.5 text-slate-400" />
+                              )
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                  <div ref={messagesEndRef} />
                 </div>
 
-                {messages.map((m) => {
-                  const isMine = m.is_mine;
-                  return (
-                    <div
-                      key={m.id}
-                      className={`flex flex-col ${isMine ? 'items-end' : 'items-start'}`}
-                    >
-                      <div
-                        className={`max-w-md px-4 py-2.5 rounded-2xl text-xs sm:text-sm shadow-sm ${
-                          isMine
-                            ? 'bg-blue-600 text-white rounded-br-none'
-                            : 'bg-white text-slate-800 border border-slate-200 rounded-bl-none'
-                        }`}
-                      >
-                        <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
-                      </div>
-
-                      <div className="flex items-center space-x-1 text-[10px] text-slate-400 mt-1 px-1">
-                        <span>
-                          {new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                        {isMine && (
-                          m.is_read ? (
-                            <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
-                          ) : (
-                            <Check className="w-3.5 h-3.5 text-slate-400" />
-                          )
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Form */}
-              <form onSubmit={handleSendMessage} className="p-4 border-t border-slate-200 bg-white flex items-center space-x-3">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type a message (e.g. Can we meet near Block 32 reception at 3 PM?)..."
-                  className="flex-1 px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:border-blue-500 outline-none"
-                />
-                <button
-                  type="submit"
-                  disabled={!newMessage.trim() || isSending}
-                  className="p-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-md transition disabled:opacity-40"
+                {/* Send Input Bar */}
+                <form
+                  onSubmit={handleSendMessage}
+                  className="p-3.5 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center space-x-2"
                 >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 p-8 space-y-2">
-              <MessageSquare className="w-12 h-12 text-slate-300" />
-              <p className="text-sm font-semibold">Select a conversation to start chatting</p>
-            </div>
-          )}
-        </div>
+                  <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    placeholder="Type your message (e.g. Can we meet at Central Library reception at 2 PM?)..."
+                    className="flex-1 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none transition"
+                  />
+                  <button
+                    type="submit"
+                    disabled={!newMessage.trim() || isSending}
+                    className="p-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-md shadow-blue-600/30 transition disabled:opacity-50 shrink-0"
+                  >
+                    <Send className="w-4 h-4" />
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div className="h-full flex items-center justify-center text-slate-400 text-xs">
+                Select a conversation on the left to start chatting.
+              </div>
+            )}
+          </div>
 
-      </div>
+        </div>
+      )}
 
       {/* Safety Modal */}
-      {activeConv && (
+      {isSafetyOpen && (
         <SafetyModal
           isOpen={isSafetyOpen}
           onClose={() => setIsSafetyOpen(false)}
-          targetUserId={activeConv.partner_id}
-          targetUserName={activeConv.partner_name}
-          conversationId={activeConv.id}
         />
       )}
 

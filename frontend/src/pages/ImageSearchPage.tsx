@@ -10,10 +10,13 @@ import {
   ArrowRight,
   ShieldAlert,
   Loader2,
-  X
+  X,
+  Sliders,
+  Scan
 } from 'lucide-react';
 import { api } from '../services/api';
 import { ItemCard } from '../components/ItemCard';
+import { EmptyState } from '../components/EmptyState';
 
 export const ImageSearchPage: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -87,140 +90,147 @@ export const ImageSearchPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
       
       {/* Title */}
       <div className="space-y-3 max-w-3xl">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600" />
+        <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-300 text-xs font-extrabold uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
           <span>Computer Vision & Vector Similarity Search</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-5xl font-black text-slate-900 dark:text-white tracking-tight">
           Find Visually Similar Belongings
         </h1>
-        <p className="text-sm text-slate-600 leading-relaxed">
+        <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
           Upload a reference photograph of an item you lost or found. Our multi-channel computer vision model extracts 128-dimensional color, gradient, texture, and shape embeddings to rank potential matches.
         </p>
       </div>
 
       {/* Strict Ownership Disclaimer */}
-      <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-xs text-amber-900 flex items-start space-x-3">
-        <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+      <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-3xl p-4 sm:p-5 text-xs text-amber-900 dark:text-amber-200 flex items-start space-x-3.5 shadow-sm">
+        <ShieldAlert className="w-5 h-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <span className="font-bold">Important University Disclaimer:</span>
-          <p className="leading-relaxed">
-            A possible visual image match provides similarity assistance only and <span className="font-semibold underline">never automatically establishes ownership</span>. Ownership must be verified through the recovery request system and confirmed by both participants.
+          <span className="font-bold">Important Campus Verification Policy:</span>
+          <p className="leading-relaxed text-amber-800 dark:text-amber-300 text-[11px] sm:text-xs">
+            A possible visual image match provides similarity assistance only and <span className="font-bold underline">never automatically establishes ownership</span>. Ownership must be verified through the recovery request system and confirmed by both participants.
           </p>
         </div>
       </div>
 
       {/* Search Console */}
-      <form onSubmit={handleSearch} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+      <form onSubmit={handleSearch} className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200/90 dark:border-slate-800/90 shadow-xl space-y-8">
         
         {/* Step 1: Target Dataset & Image Upload */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           
           {/* Left: Upload Reference Image */}
-          <div className="space-y-2">
-            <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider">
+          <div className="space-y-3">
+            <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               1. Reference Photograph
             </label>
 
             {previewUrl ? (
-              <div className="relative aspect-video rounded-2xl border-2 border-blue-500 overflow-hidden bg-slate-100 group">
+              <div className="relative aspect-video rounded-2xl border-2 border-blue-500 overflow-hidden bg-slate-100 dark:bg-slate-800 group shadow-md">
                 <img src={previewUrl} alt="Query reference" className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={handleClearImage}
-                  className="absolute top-2 right-2 p-1.5 bg-slate-900/80 text-white rounded-full hover:bg-red-600 transition"
+                  className="absolute top-2.5 right-2.5 p-2 bg-slate-900/80 text-white rounded-full hover:bg-rose-600 transition shadow-md"
                   title="Remove reference photo"
                 >
                   <X className="w-4 h-4" />
                 </button>
-                <div className="absolute bottom-2 left-2 bg-navy-950/80 text-white px-2 py-0.5 rounded text-[11px] font-semibold">
-                  Photo Loaded for Feature Extraction
+                <div className="absolute bottom-2.5 left-2.5 bg-navy-950/90 text-white px-3 py-1 rounded-lg text-xs font-bold backdrop-blur-md flex items-center space-x-1.5 border border-blue-500/40">
+                  <Scan className="w-3.5 h-3.5 text-blue-400" />
+                  <span>Photo Ready for Embedding</span>
                 </div>
               </div>
             ) : (
-              <label className="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50 hover:bg-blue-50/20 transition duration-200 group">
+              <label className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 rounded-2xl p-8 flex flex-col items-center justify-center text-center cursor-pointer bg-slate-50 dark:bg-slate-800/40 hover:bg-blue-50/30 dark:hover:bg-slate-800 transition duration-200 group">
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/jpg"
                   onChange={handleFileChange}
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                 />
-                <div className="w-12 h-12 rounded-2xl bg-blue-100 group-hover:bg-blue-200 text-blue-600 flex items-center justify-center mb-2 transition">
-                  <Camera className="w-6 h-6" />
+                <div className="w-14 h-14 rounded-2xl bg-blue-100 dark:bg-blue-950 group-hover:bg-blue-200 dark:group-hover:bg-blue-900 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3 transition shadow-sm">
+                  <Camera className="w-7 h-7" />
                 </div>
-                <span className="text-xs font-bold text-slate-700">Click to upload reference photo</span>
-                <span className="text-[11px] text-slate-400 mt-0.5">JPEG, PNG, WebP up to 10MB</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                  Click or drag photo to upload
+                </span>
+                <span className="text-[11px] text-slate-400 mt-1">JPEG, PNG, WebP up to 10MB</span>
               </label>
             )}
 
-            <p className="text-[11px] text-slate-400">
-              {selectedFile ? 'Image feature vector will be calculated on submission.' : 'Optional: If no photo is available, the search falls back to keyword and metadata matching.'}
+            <p className="text-[11px] text-slate-400 dark:text-slate-500">
+              {selectedFile ? 'Perceptual HSV, YCbCr & gradient feature vectors will be calculated on search.' : 'Optional: If no photo is available, the search falls back to keyword and metadata matching.'}
             </p>
           </div>
 
           {/* Right: Search Target & Filters */}
-          <div className="space-y-4">
+          <div className="space-y-5">
             <div>
-              <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">
-                2. Where do you want to search?
+              <label className="block text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2">
+                2. Target Catalog to Query
               </label>
               <div className="grid grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setTargetType('found')}
-                  className={`py-3 px-4 rounded-xl text-xs font-bold border transition ${
+                  className={`py-3.5 px-4 rounded-2xl text-xs font-bold border transition text-left ${
                     targetType === 'found'
-                      ? 'bg-emerald-50 border-emerald-500 text-emerald-800 shadow-sm'
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/50 border-emerald-500 text-emerald-800 dark:text-emerald-300 shadow-md ring-2 ring-emerald-500/20'
+                      : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Search Found Items
-                  <span className="block text-[10px] font-normal text-slate-500 mt-0.5">I lost something, search what was found</span>
+                  <span className="block font-black text-sm mb-0.5">Search Found Items</span>
+                  <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400 leading-snug">
+                    I lost an item; search what finders turned in
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setTargetType('lost')}
-                  className={`py-3 px-4 rounded-xl text-xs font-bold border transition ${
+                  className={`py-3.5 px-4 rounded-2xl text-xs font-bold border transition text-left ${
                     targetType === 'lost'
-                      ? 'bg-red-50 border-red-500 text-red-800 shadow-sm'
-                      : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      ? 'bg-rose-50 dark:bg-rose-950/50 border-rose-500 text-rose-800 dark:text-rose-300 shadow-md ring-2 ring-rose-500/20'
+                      : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
-                  Search Lost Reports
-                  <span className="block text-[10px] font-normal text-slate-500 mt-0.5">I found something, search who lost it</span>
+                  <span className="block font-black text-sm mb-0.5">Search Lost Reports</span>
+                  <span className="block text-[11px] font-normal text-slate-500 dark:text-slate-400 leading-snug">
+                    I found an item; search who reported losing it
+                  </span>
                 </button>
               </div>
             </div>
 
             {/* Keyword fallback */}
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Optional Keyword or Brand
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Keyword & Brand Query (Optional)
               </label>
               <input
                 type="text"
                 value={keyword}
                 onChange={(e) => setKeyword(e.target.value)}
-                placeholder="e.g. Dell, Casio, Wildcraft, Black wallet..."
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                placeholder="e.g. Dell Inspiron, Blue bottle, Titan watch..."
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none transition"
               />
             </div>
 
-            {/* Filters */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* Dropdown Filters */}
+            <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Category Filter
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Category
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-medium outline-none"
                 >
                   {categories.map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -229,16 +239,41 @@ export const ImageSearchPage: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Colour Filter
+                <label className="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                  Campus Location
                 </label>
-                <input
-                  type="text"
-                  value={colour}
-                  onChange={(e) => setColour(e.target.value)}
-                  placeholder="e.g. Blue, Red, Silver"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
-                />
+                <select
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-xl font-medium outline-none truncate"
+                >
+                  <option value="All">All Locations</option>
+                  {campusLocations.map((loc) => (
+                    <option key={loc.id} value={loc.name}>{loc.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Similarity Sensitivity Slider */}
+            <div>
+              <div className="flex items-center justify-between text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                <span>Minimum Match Sensitivity:</span>
+                <span className="text-blue-600 dark:text-blue-400 font-mono">{minSimilarity}%</span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="80"
+                step="5"
+                value={minSimilarity}
+                onChange={(e) => setMinSimilarity(Number(e.target.value))}
+                className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+              <div className="flex justify-between text-[10px] text-slate-400 mt-1 font-medium">
+                <span>Broad (10%)</span>
+                <span>Balanced (30%)</span>
+                <span>Strict (80%)</span>
               </div>
             </div>
 
@@ -247,24 +282,21 @@ export const ImageSearchPage: React.FC = () => {
         </div>
 
         {/* Action Button */}
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-          <div className="text-xs text-slate-500">
-            Cosine vector similarity threshold: <span className="font-semibold text-blue-600">{minSimilarity}%</span>
-          </div>
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
           <button
             type="submit"
             disabled={isSearching}
-            className="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-xs shadow-md shadow-blue-600/30 flex items-center space-x-2 transition disabled:opacity-50"
+            className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-xl shadow-blue-600/30 transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2 disabled:opacity-50"
           >
             {isSearching ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Computing Visual Similarity...</span>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>Computing 128-D Vector Cosine Similarity...</span>
               </>
             ) : (
               <>
-                <Sparkles className="w-4 h-4" />
-                <span>Compute Similar Matches</span>
+                <Sparkles className="w-5 h-5 text-amber-300" />
+                <span>Compute Similarities & Find Matches</span>
               </>
             )}
           </button>
@@ -273,40 +305,33 @@ export const ImageSearchPage: React.FC = () => {
       </form>
 
       {/* Results Section */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-bold text-slate-900 flex items-center space-x-2">
-            <span>Visual & Metadata Matches</span>
-            {hasSearched && (
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-700">
-                {matches.length} found
-              </span>
-            )}
-          </h2>
-        </div>
+      {hasSearched && (
+        <div className="space-y-6 pt-4">
+          <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+            <h2 className="text-2xl font-black text-slate-900 dark:text-white">
+              Similarity Results ({matches.length})
+            </h2>
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+              Ranked by multi-factor visual & metadata match
+            </span>
+          </div>
 
-        {isSearching ? (
-          <div className="py-20 text-center space-y-3">
-            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto" />
-            <p className="text-sm font-semibold text-slate-700">Extracting image embeddings and ranking similarity...</p>
-            <p className="text-xs text-slate-400">Comparing color histograms, edge gradients, and spatial layout vectors</p>
-          </div>
-        ) : hasSearched && matches.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-3xl border border-slate-200 p-8 space-y-3">
-            <Camera className="w-10 h-10 text-slate-300 mx-auto" />
-            <h3 className="text-base font-bold text-slate-800">No matching items found</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
-              No reports in the database exceeded the similarity threshold. Try broadening your category or location filters.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {matches.map((item) => (
-              <ItemCard key={item.report_id} item={item} />
-            ))}
-          </div>
-        )}
-      </div>
+          {matches.length === 0 ? (
+            <EmptyState
+              title="No Visually Similar Belongings Found"
+              description="No existing records crossed the similarity threshold. Try lowering the minimum match sensitivity slider or searching by general category."
+              actionText="Reset Sensitivity to 20%"
+              onAction={() => setMinSimilarity(20)}
+            />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {matches.map((item) => (
+                <ItemCard key={item.id || item.report_id} item={item} type={targetType} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
     </div>
   );

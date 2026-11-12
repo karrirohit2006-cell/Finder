@@ -13,8 +13,8 @@ export const NotificationDropdown: React.FC = () => {
   const fetchNotifs = async () => {
     try {
       const data = await api.getNotifications();
-      setNotifications(data);
-      setUnreadCount(data.filter((n) => !n.is_read).length);
+      setNotifications(data || []);
+      setUnreadCount((data || []).filter((n: any) => !n.is_read).length);
     } catch (e) {
       // silent
     }
@@ -66,25 +66,25 @@ export const NotificationDropdown: React.FC = () => {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-slate-300 hover:text-white rounded-lg hover:bg-navy-800 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="relative p-2.5 text-slate-300 hover:text-white rounded-xl hover:bg-navy-800 dark:hover:bg-slate-800 transition focus:outline-none"
         title="Notifications"
         aria-label="Notifications"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-4 h-4" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full animate-pulse">
+          <span className="absolute top-1.5 right-1.5 flex items-center justify-center w-4 h-4 text-[10px] font-black text-white bg-rose-500 rounded-full animate-pulse shadow-md">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-slate-100">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 py-2 z-50 animate-in fade-in zoom-in-95 duration-150 text-slate-900 dark:text-white">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center space-x-2">
-              <span className="font-semibold text-slate-800 text-sm">Notifications</span>
+              <span className="font-extrabold text-xs uppercase tracking-wider">Campus Alerts</span>
               {unreadCount > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">
+                <span className="px-2 py-0.5 text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 rounded-full">
                   {unreadCount} new
                 </span>
               )}
@@ -92,7 +92,7 @@ export const NotificationDropdown: React.FC = () => {
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
-                className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center space-x-1"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-bold flex items-center space-x-1"
               >
                 <Check className="w-3.5 h-3.5" />
                 <span>Mark all read</span>
@@ -100,36 +100,42 @@ export const NotificationDropdown: React.FC = () => {
             )}
           </div>
 
-          <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+          <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800/80">
             {notifications.length === 0 ? (
-              <div className="p-6 text-center text-slate-400 text-sm">
-                No notifications yet.
+              <div className="p-6 text-center text-xs text-slate-400 dark:text-slate-500">
+                No notifications right now.
               </div>
             ) : (
               notifications.map((n) => (
                 <div
                   key={n.id}
                   onClick={() => handleItemClick(n)}
-                  className={`p-3.5 hover:bg-slate-50 transition cursor-pointer flex flex-col space-y-1 ${
-                    !n.is_read ? 'bg-blue-50/50' : ''
+                  className={`p-3.5 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition cursor-pointer flex items-start space-x-3 ${
+                    !n.is_read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
                   }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className={`text-xs font-semibold ${!n.is_read ? 'text-blue-900' : 'text-slate-700'}`}>
+                  <span
+                    className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
+                      !n.is_read ? 'bg-blue-600' : 'bg-transparent'
+                    }`}
+                  />
+                  <div className="flex-1 space-y-1">
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block leading-snug">
                       {n.title}
                     </span>
-                    <span className="text-[10px] text-slate-400">
-                      {new Date(n.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    <p className="text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                      {n.message}
+                    </p>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 block">
+                      {new Date(n.created_at).toLocaleDateString()}
                     </span>
                   </div>
-                  <p className="text-xs text-slate-600 line-clamp-2">{n.message}</p>
+                  {n.link && (
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-400 shrink-0 self-center" />
+                  )}
                 </div>
               ))
             )}
-          </div>
-
-          <div className="px-4 py-2 border-t border-slate-100 text-center">
-            <span className="text-[11px] text-slate-400">All notifications saved to your campus account</span>
           </div>
         </div>
       )}

@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Star, CheckCircle2, AlertCircle, MessageSquareQuote, ShieldCheck } from 'lucide-react';
+import { Star, CheckCircle2, AlertCircle, MessageSquareQuote, ShieldCheck, Sparkles, User } from 'lucide-react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { EmptyState } from '../components/EmptyState';
 
 export const FeedbackPage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const requestIdParam = searchParams.get('request_id');
-  const requestCodeParam = searchParams.get('request_code');
 
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -68,34 +68,38 @@ export const FeedbackPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
       
       {/* Title */}
-      <div className="border-b border-slate-200 pb-5 max-w-2xl">
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-          Campus Recovery Feedback
+      <div className="border-b border-slate-200 dark:border-slate-800 pb-5 max-w-2xl">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 text-xs font-bold uppercase tracking-wider mb-2 border border-amber-200 dark:border-amber-900">
+          <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+          <span>Peer Verification & Reviews</span>
+        </div>
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+          Campus Recovery Reviews
         </h1>
-        <p className="text-sm text-slate-500 mt-1">
-          Share your recovery experience. Verified community feedback ensures accountability and mutual trust across the university.
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Share your recovery experience. Verified community feedback ensures accountability, honesty, and mutual trust across Lovely Professional University.
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Left: Submit Feedback Form */}
-        <div className="lg:col-span-1 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm space-y-6">
-          <h2 className="text-lg font-bold text-slate-900">Submit Your Experience</h2>
+        <div className="lg:col-span-1 bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-6 h-fit">
+          <h2 className="text-lg font-black text-slate-900 dark:text-white">Submit Recovery Review</h2>
 
           {success ? (
-            <div className="p-5 bg-emerald-50 border border-emerald-200 rounded-2xl text-emerald-900 text-xs space-y-3">
-              <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+            <div className="p-5 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 rounded-2xl text-emerald-900 dark:text-emerald-200 text-xs space-y-3">
+              <CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               <p className="font-bold text-sm">Thank You for Your Feedback!</p>
               <p className="leading-relaxed">
                 Your feedback has been verified and added to the community rating statistics.
               </p>
               <button
                 onClick={() => setSuccess(false)}
-                className="text-xs text-blue-600 font-semibold hover:underline block pt-1"
+                className="text-xs text-blue-600 dark:text-blue-400 font-bold hover:underline block pt-1"
               >
                 Submit another review
               </button>
@@ -104,7 +108,7 @@ export const FeedbackPage: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               
               {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center space-x-2">
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center space-x-2">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   <span>{error}</span>
                 </div>
@@ -112,11 +116,11 @@ export const FeedbackPage: React.FC = () => {
 
               {/* Select Completed Recovery */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Completed Recovery <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Completed Recovery <span className="text-rose-500">*</span>
                 </label>
                 {completedRequests.length === 0 ? (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500">
+                  <div className="p-3.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-500 dark:text-slate-400">
                     You do not have any completed recoveries yet. Feedback is enabled once both parties confirm item return.
                   </div>
                 ) : (
@@ -124,7 +128,7 @@ export const FeedbackPage: React.FC = () => {
                     value={requestId || ''}
                     onChange={(e) => setRequestId(Number(e.target.value))}
                     required
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-medium focus:bg-white focus:border-blue-500 outline-none"
+                    className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
                   >
                     {completedRequests.map((r) => (
                       <option key={r.id} value={r.id}>
@@ -137,8 +141,8 @@ export const FeedbackPage: React.FC = () => {
 
               {/* Star Rating */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
-                  Rating (1 to 5 Stars) <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Rating (1 to 5 Stars) <span className="text-rose-500">*</span>
                 </label>
                 <div className="flex items-center space-x-2">
                   {[1, 2, 3, 4, 5].map((s) => (
@@ -152,24 +156,24 @@ export const FeedbackPage: React.FC = () => {
                         className={`w-7 h-7 ${
                           s <= rating
                             ? 'text-amber-400 fill-amber-400'
-                            : 'text-slate-300'
+                            : 'text-slate-300 dark:text-slate-600'
                         }`}
                       />
                     </button>
                   ))}
-                  <span className="text-xs font-bold text-slate-700 ml-2">{rating}/5 Stars</span>
+                  <span className="text-xs font-bold text-slate-700 dark:text-slate-300 ml-2">{rating}/5 Stars</span>
                 </div>
               </div>
 
               {/* Experience Tag */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
                   Experience Highlight
                 </label>
                 <select
                   value={experience}
                   onChange={(e) => setExperience(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:bg-white focus:border-blue-500 outline-none"
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-medium focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
                 >
                   <option value="Smooth & Trustworthy">Smooth & Trustworthy</option>
                   <option value="Quick Campus Coordination">Quick Campus Coordination</option>
@@ -180,8 +184,8 @@ export const FeedbackPage: React.FC = () => {
 
               {/* Written Review */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Written Feedback <span className="text-red-500">*</span>
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                  Written Feedback <span className="text-rose-500">*</span>
                 </label>
                 <textarea
                   rows={4}
@@ -189,90 +193,84 @@ export const FeedbackPage: React.FC = () => {
                   value={comment}
                   onChange={(e) => setComment(e.target.value)}
                   placeholder="Share details of how you connected, where the handoff occurred..."
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:border-blue-500 outline-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none leading-relaxed"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting || completedRequests.length === 0}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-600/30 transition disabled:opacity-50"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black shadow-md shadow-blue-600/30 transition disabled:opacity-50"
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Verified Feedback'}
+                {isSubmitting ? 'Submitting...' : 'Post Verified Review'}
               </button>
             </form>
           )}
-
         </div>
 
-        {/* Right: Community Ratings & Testimonials */}
+        {/* Right: Reviews Feed & Summary */}
         <div className="lg:col-span-2 space-y-6">
           
-          {/* Rating Summary Banner */}
-          <div className="bg-gradient-to-r from-navy-950 via-navy-900 to-navy-800 text-white p-6 sm:p-8 rounded-3xl border border-navy-700 shadow-md flex items-center justify-between">
-            <div>
-              <span className="text-xs uppercase tracking-wider text-blue-300 font-semibold block">
-                Community Trust Score
+          {/* Summary Banner */}
+          <div className="bg-gradient-to-r from-blue-900 via-navy-900 to-navy-950 text-white p-6 rounded-3xl shadow-lg border border-blue-800 flex items-center justify-between">
+            <div className="space-y-1">
+              <span className="text-xs uppercase tracking-wider text-blue-300 font-bold block">
+                Platform Satisfaction Score
               </span>
-              <div className="flex items-center space-x-3 mt-1">
-                <span className="text-4xl font-extrabold text-white">{summary.average_rating}</span>
-                <div>
-                  <div className="flex text-amber-400">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <Star key={i} className="w-4 h-4 fill-amber-400" />
-                    ))}
-                  </div>
-                  <span className="text-xs text-slate-400">Based on {summary.total_feedbacks} verified handoffs</span>
+              <div className="flex items-center space-x-3">
+                <span className="text-4xl font-black">{summary.average_rating || 5.0}</span>
+                <div className="flex items-center text-amber-400">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star key={s} className="w-5 h-5 fill-amber-400" />
+                  ))}
                 </div>
               </div>
             </div>
 
-            <div className="hidden sm:block text-right">
-              <span className="inline-block px-3 py-1 rounded-full bg-blue-900/60 border border-blue-500/40 text-blue-300 text-xs font-bold">
-                100% Peer Verified
-              </span>
+            <div className="text-right">
+              <span className="block text-2xl font-black">{summary.total_feedbacks || 0}</span>
+              <span className="text-xs text-slate-300">Verified Recoveries</span>
             </div>
           </div>
 
-          {/* Testimonials List */}
+          {/* Feedback Cards */}
           <div className="space-y-4">
-            <h3 className="font-bold text-slate-900 text-base">Recent Community Experiences</h3>
+            <h3 className="font-extrabold text-base text-slate-900 dark:text-white">
+              Recent Verified Community Testimonials
+            </h3>
 
             {publicFeedbacks.length === 0 ? (
-              <div className="p-8 text-center text-xs text-slate-400 bg-white rounded-2xl border border-slate-200">
-                No feedback published yet. Be the first to share your recovery story!
-              </div>
+              <EmptyState
+                title="No Community Reviews Yet"
+                description="Once students and staff complete recovery handoffs and share feedback, their ratings will be showcased here."
+              />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {publicFeedbacks.map((fb) => (
                   <div
                     key={fb.id}
-                    className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3 flex flex-col justify-between"
+                    className="p-5 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800/90 shadow-sm hover:shadow-md transition space-y-3 flex flex-col justify-between"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex text-amber-400">
-                          {Array.from({ length: fb.rating }).map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                        <div className="flex items-center text-amber-400">
+                          {[...Array(fb.rating || 5)].map((_, i) => (
+                            <Star key={i} className="w-4 h-4 fill-amber-400" />
                           ))}
                         </div>
-                        <span className="text-[10px] text-slate-400">
-                          {new Date(fb.created_at).toLocaleDateString()}
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
+                          {fb.recovery_experience}
                         </span>
                       </div>
 
-                      <p className="text-xs text-slate-700 italic leading-relaxed">
+                      <p className="text-xs text-slate-600 dark:text-slate-300 italic leading-relaxed">
                         "{fb.comment}"
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                      <span className="font-bold text-slate-800">{fb.user_name}</span>
-                      {fb.recovery_experience && (
-                        <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-medium">
-                          {fb.recovery_experience}
-                        </span>
-                      )}
+                    <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+                      <span className="font-bold text-slate-700 dark:text-slate-300">{fb.author_name}</span>
+                      <span>{new Date(fb.created_at).toLocaleDateString()}</span>
                     </div>
                   </div>
                 ))}

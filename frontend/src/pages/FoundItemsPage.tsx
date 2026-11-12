@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, Filter, PlusCircle, ArrowUpDown, Tag, MapPin, Camera } from 'lucide-react';
+import { Search, Filter, PlusCircle, ArrowUpDown, Tag, MapPin, X, Camera } from 'lucide-react';
 import { api } from '../services/api';
 import { ItemCard } from '../components/ItemCard';
+import { ItemCardSkeleton } from '../components/Skeleton';
+import { EmptyState } from '../components/EmptyState';
 
 export const FoundItemsPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,35 +57,44 @@ export const FoundItemsPage: React.FC = () => {
     fetchItems();
   };
 
+  const clearFilters = () => {
+    setQuery('');
+    setCategory('All');
+    setLocation('All');
+    setSortBy('newest');
+  };
+
+  const hasActiveFilters = query.trim() !== '' || category !== 'All' || location !== 'All' || sortBy !== 'newest';
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6">
         <div>
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-2">
-            <span>Found Belongings Directory</span>
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-xs font-extrabold uppercase tracking-wider mb-2 border border-emerald-200 dark:border-emerald-900">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>Found Belongings Inventory</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Browse Found Items
           </h1>
-          <p className="text-sm text-slate-500">
-            View items retrieved across Lovely Professional University. If an item belongs to you, send a recovery request.
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Items found and photographed across Lovely Professional University awaiting safe return. If you recognize your item, send a recovery request.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3 self-start sm:self-auto">
+        <div className="flex items-center gap-3 self-start sm:self-auto">
           <Link
             to="/search/image"
-            className="px-4 py-3 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold text-xs border border-blue-200 transition flex items-center space-x-1.5"
+            className="px-4 py-3 rounded-2xl bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-600 dark:text-blue-400 font-bold text-xs hover:bg-blue-100 dark:hover:bg-blue-900 transition flex items-center space-x-1.5"
           >
-            <Camera className="w-4 h-4 text-blue-600" />
-            <span>Search by Image</span>
+            <Camera className="w-4 h-4" />
+            <span>Search by Photo</span>
           </Link>
-
           <Link
             to="/report/found"
-            className="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs shadow-md transition flex items-center space-x-2"
+            className="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-600/20 transition transform hover:-translate-y-0.5 flex items-center space-x-2"
           >
             <PlusCircle className="w-4 h-4" />
             <span>Report Found Item</span>
@@ -91,8 +102,8 @@ export const FoundItemsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Filter Bar */}
-      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+      {/* Filter Toolbar */}
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/90 dark:border-slate-800/90 shadow-sm space-y-4">
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
             <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -100,88 +111,102 @@ export const FoundItemsPage: React.FC = () => {
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search found items by keywords, brand, color, or ID..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:bg-white focus:border-blue-500 outline-none"
+              placeholder="Search found items by keywords, brand, color, or report ID..."
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none transition"
             />
           </div>
           <button
             type="submit"
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-sm transition"
+            className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 transition shrink-0"
           >
             Search
           </button>
         </form>
 
-        <div className="flex flex-wrap items-center gap-3 pt-2 border-t border-slate-100 text-xs">
-          
-          {/* Category Filter */}
-          <div className="flex items-center space-x-1.5">
-            <Tag className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-semibold text-slate-700">Category:</span>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none"
-            >
-              {categories.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center space-x-2">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Category:</span>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg px-2.5 py-1.5 font-medium outline-none"
+              >
+                {categories.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Location:</span>
+              <select
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg px-2.5 py-1.5 font-medium outline-none max-w-[180px] truncate"
+              >
+                <option value="All">All Campus Zones</option>
+                {campusLocations.map((loc) => (
+                  <option key={loc.id} value={loc.name}>{loc.name}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="text-slate-500 dark:text-slate-400 font-semibold">Sort:</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 rounded-lg px-2.5 py-1.5 font-medium outline-none"
+              >
+                <option value="newest">Newest First</option>
+                <option value="oldest">Oldest First</option>
+              </select>
+            </div>
           </div>
 
-          {/* Location Filter */}
-          <div className="flex items-center space-x-1.5">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-semibold text-slate-700">Campus Location:</span>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none max-w-[200px] truncate"
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center space-x-1 font-semibold transition"
             >
-              <option value="All">All Campus Locations</option>
-              {campusLocations.map((loc) => (
-                <option key={loc.id} value={loc.name}>{loc.name}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sorting */}
-          <div className="flex items-center space-x-1.5 ml-auto">
-            <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
-            <span className="font-semibold text-slate-700">Sort:</span>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs outline-none"
-            >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-            </select>
-          </div>
-
+              <X className="w-3.5 h-3.5" />
+              <span>Reset Filters</span>
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Item Grid */}
-      {isLoading ? (
-        <div className="py-20 text-center text-slate-400 text-sm">
-          Loading found items...
+      {/* Results Section */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <span>Showing {items.length} found reports</span>
         </div>
-      ) : items.length === 0 ? (
-        <div className="py-20 text-center bg-white rounded-3xl border border-slate-200 p-8 space-y-3">
-          <Tag className="w-10 h-10 text-slate-300 mx-auto" />
-          <h3 className="text-base font-bold text-slate-800">No found items match your criteria</h3>
-          <p className="text-xs text-slate-500 max-w-sm mx-auto">
-            Try adjusting your search keywords, category filters, or location.
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {items.map((item) => (
-            <ItemCard key={item.id} item={item} type="found" />
-          ))}
-        </div>
-      )}
+
+        {isLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ItemCardSkeleton />
+            <ItemCardSkeleton />
+            <ItemCardSkeleton />
+            <ItemCardSkeleton />
+          </div>
+        ) : items.length === 0 ? (
+          <EmptyState
+            title="No Matching Found Items"
+            description="No items match your active filters. If you lost an item, consider reporting it so finders can reach you."
+            actionText="Reset All Filters"
+            onAction={clearFilters}
+            secondaryActionText="Report What You Lost"
+            onSecondaryAction={() => window.location.href = '/report/lost'}
+          />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {items.map((item) => (
+              <ItemCard key={item.id} item={item} type="found" />
+            ))}
+          </div>
+        )}
+      </div>
 
     </div>
   );

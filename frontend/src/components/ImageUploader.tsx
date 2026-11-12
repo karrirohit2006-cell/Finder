@@ -3,13 +3,15 @@ import { Upload, X, Image as ImageIcon, AlertCircle, Loader2 } from 'lucide-reac
 import { api } from '../services/api';
 
 interface ImageUploaderProps {
-  onImagesChange: (paths: string[], embeddings?: number[][]) => void;
+  onImagesChange?: (paths: string[], embeddings?: number[][]) => void;
+  onUploadComplete?: (paths: string[], embeddings?: number[][]) => void;
   maxFiles?: number;
   required?: boolean;
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   onImagesChange,
+  onUploadComplete,
   maxFiles = 4,
   required = false
 }) => {
@@ -21,6 +23,11 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   }>>([]);
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const notifyChange = (paths: string[], embs: number[][]) => {
+    if (onImagesChange) onImagesChange(paths, embs);
+    if (onUploadComplete) onUploadComplete(paths, embs);
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -66,8 +73,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
     setImages(newItems);
     setIsUploading(false);
 
-    // Notify parent
-    onImagesChange(
+    notifyChange(
       newItems.map((item) => item.path),
       newItems.map((item) => item.embedding || [])
     );
@@ -76,7 +82,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   const handleRemove = (index: number) => {
     const updated = images.filter((_, i) => i !== index);
     setImages(updated);
-    onImagesChange(
+    notifyChange(
       updated.map((item) => item.path),
       updated.map((item) => item.embedding || [])
     );
@@ -85,16 +91,16 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="block text-sm font-semibold text-slate-800">
-          Photographs {required && <span className="text-red-500">*</span>}
+        <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+          Photographs {required && <span className="text-rose-500">*</span>}
         </label>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-slate-500 dark:text-slate-400">
           {images.length}/{maxFiles} uploaded
         </span>
       </div>
 
       {/* Upload Zone */}
-      <div className="relative border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-6 transition duration-200 bg-slate-50 hover:bg-blue-50/20 text-center cursor-pointer group">
+      <div className="relative border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-500 dark:hover:border-blue-400 rounded-2xl p-6 transition duration-200 bg-slate-50 dark:bg-slate-800/40 hover:bg-blue-50/20 text-center cursor-pointer group">
         <input
           type="file"
           accept="image/jpeg,image/png,image/webp,image/jpg"
@@ -104,62 +110,49 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
         />
 
-        <div className="flex flex-col items-center justify-center space-y-2 pointer-events-none">
-          {isUploading ? (
-            <div className="flex flex-col items-center space-y-2 text-blue-600">
-              <Loader2 className="w-8 h-8 animate-spin" />
-              <span className="text-xs font-semibold">Processing & extracting visual embeddings...</span>
-            </div>
-          ) : (
-            <>
-              <div className="w-12 h-12 rounded-full bg-blue-100 group-hover:bg-blue-200 flex items-center justify-center text-blue-600 transition">
-                <Upload className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-slate-700">
-                  Click to upload or drag & drop photographs
-                </p>
-                <p className="text-xs text-slate-400 mt-0.5">
-                  JPEG, PNG, WebP up to 10MB each. Minimum 30x30 pixels.
-                </p>
-              </div>
-            </>
-          )}
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <div className="w-12 h-12 rounded-2xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition shadow-sm">
+            {isUploading ? (
+              <Loader2 className="w-6 h-6 animate-spin" />
+            ) : (
+              <Upload className="w-6 h-6" />
+            )}
+          </div>
+          <div>
+            <p className="text-xs font-bold text-slate-700 dark:text-slate-200">
+              {isUploading ? 'Extracting visual features...' : 'Click or drop photographs here'}
+            </p>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">
+              Supports JPEG, PNG, WebP up to 10MB (Max {maxFiles} images)
+            </p>
+          </div>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center space-x-2 text-xs text-red-600 bg-red-50 border border-red-200 rounded-lg p-2.5">
+        <div className="p-3 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 rounded-xl text-xs text-rose-700 dark:text-rose-300 flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* Previews */}
+      {/* Previews Grid */}
       {images.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
           {images.map((img, idx) => (
-            <div key={idx} className="relative aspect-square rounded-lg border border-slate-200 bg-slate-100 overflow-hidden group">
-              <img
-                src={img.url}
-                alt={img.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                <button
-                  type="button"
-                  onClick={() => handleRemove(idx)}
-                  className="p-1.5 rounded-full bg-red-600 text-white hover:bg-red-700 transition"
-                  title="Remove image"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+            <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700 group shadow-sm bg-slate-100 dark:bg-slate-800">
+              <img src={img.url} alt={img.name} className="w-full h-full object-cover" />
+              <button
+                type="button"
+                onClick={() => handleRemove(idx)}
+                className="absolute top-1.5 right-1.5 p-1.5 bg-slate-900/80 hover:bg-rose-600 text-white rounded-full transition shadow-md"
+                title="Remove photo"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+              <div className="absolute bottom-0 inset-x-0 bg-slate-950/70 p-1 text-[10px] text-slate-200 truncate text-center">
+                Photo {idx + 1}
               </div>
-              {idx === 0 && (
-                <span className="absolute bottom-1 left-1 px-1.5 py-0.5 text-[9px] font-bold bg-navy-950/80 text-white rounded">
-                  Primary
-                </span>
-              )}
             </div>
           ))}
         </div>

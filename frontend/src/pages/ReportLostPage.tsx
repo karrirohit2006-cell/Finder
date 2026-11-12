@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PlusCircle, AlertCircle, CheckCircle2, MapPin, Calendar, Clock, Tag } from 'lucide-react';
+import { PlusCircle, AlertCircle, CheckCircle2, MapPin, Calendar, Clock, Tag, ArrowLeft } from 'lucide-react';
 import { api } from '../services/api';
 import { ImageUploader } from '../components/ImageUploader';
 import { useAuth } from '../context/AuthContext';
@@ -70,57 +70,60 @@ export const ReportLostPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-8">
       
       {/* Title */}
-      <div className="space-y-2 border-b border-slate-200 pb-5">
-        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-red-100 text-red-800 text-xs font-bold uppercase tracking-wider">
-          <span>Lost Item Report</span>
+      <div className="space-y-2 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 text-xs font-black uppercase tracking-wider border border-rose-200 dark:border-rose-900">
+          <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
+          <span>Lost Item Filing</span>
         </div>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
           Report a Lost Belonging
         </h1>
-        <p className="text-sm text-slate-500">
+        <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
           Provide as much detail as possible to help the campus community identify and return your item.
         </p>
       </div>
 
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-xl flex items-center space-x-2 text-xs text-red-700">
-          <AlertCircle className="w-4 h-4 shrink-0" />
+        <div className="p-4 bg-rose-50 dark:bg-rose-950/50 border border-rose-200 dark:border-rose-900 rounded-2xl flex items-center space-x-2.5 text-xs text-rose-700 dark:text-rose-300">
+          <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-200 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl shadow-xl border border-slate-200/90 dark:border-slate-800/90 space-y-6">
         
         {/* Item Basic Details */}
         <div className="space-y-4">
-          <h2 className="text-base font-bold text-slate-900">1. Item Information</h2>
-
+          <h2 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
+            1. Item Specifications
+          </h2>
+          
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Item Name <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Item Name <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={itemName}
                 onChange={(e) => setItemName(e.target.value)}
-                placeholder="e.g. Blue HP Pavilion Laptop"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                placeholder="e.g. Dell Inspiron 15 Laptop, Blue Titan Watch"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Category <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Category <span className="text-rose-500">*</span>
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm font-semibold focus:border-blue-500 outline-none"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -131,142 +134,132 @@ export const ReportLostPage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Primary Colour <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Primary Colour <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={colour}
                 onChange={(e) => setColour(e.target.value)}
-                placeholder="e.g. Navy Blue, Silver, Matte Black"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                placeholder="e.g. Matte Black, Navy Blue, Silver"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Brand / Manufacturer (optional)
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Brand / Manufacturer (Optional)
               </label>
               <input
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="e.g. Apple, Dell, Titan, Wildcraft"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                placeholder="e.g. Dell, Apple, Nike, Casio, Wildcraft"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Description <span className="text-red-500">*</span>
+            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              Description & Identifying Marks <span className="text-rose-500">*</span>
             </label>
             <textarea
               required
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe distinguishing marks, stickers, case color, model details..."
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+              placeholder="Describe scratches, keychains, stickers, case color, unique markings..."
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs sm:text-sm focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none leading-relaxed"
             />
           </div>
         </div>
 
-        {/* Date & Location */}
-        <div className="space-y-4 pt-4 border-t border-slate-100">
-          <h2 className="text-base font-bold text-slate-900">2. Where & When was it Lost?</h2>
+        {/* Location & Time */}
+        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <h2 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
+            2. Incident Location & Timing
+          </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="sm:col-span-1">
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Campus Location <span className="text-rose-500">*</span>
+              </label>
+              <select
+                required
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:border-blue-500 outline-none"
+              >
+                <option value="">Select LPU Block...</option>
+                {campusLocations.map((loc) => (
+                  <option key={loc.id} value={loc.name}>{loc.name}</option>
+                ))}
+              </select>
+            </div>
+
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Date Lost <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Date Lost <span className="text-rose-500">*</span>
               </label>
               <input
                 type="date"
                 required
                 value={lostDate}
                 onChange={(e) => setLostDate(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">
-                Approximate Time <span className="text-red-500">*</span>
+              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                Approximate Time <span className="text-rose-500">*</span>
               </label>
               <input
                 type="text"
                 required
                 value={approxTime}
                 onChange={(e) => setApproxTime(e.target.value)}
-                placeholder="e.g. Around 2:30 PM, Morning recess"
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
+                placeholder="e.g. 10:30 AM or Afternoon"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white rounded-xl text-xs font-semibold focus:bg-white dark:focus:bg-slate-800 focus:border-blue-500 outline-none"
               />
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Campus Location <span className="text-red-500">*</span>
-            </label>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
-            >
-              <option value="">Select an LPU Campus Location...</option>
-              {campusLocations.map((loc) => (
-                <option key={loc.id} value={loc.name}>
-                  {loc.category} — {loc.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">
-              Additional Identifying Details (optional)
-            </label>
-            <input
-              type="text"
-              value={additionalDetails}
-              onChange={(e) => setAdditionalDetails(e.target.value)}
-              placeholder="e.g. Specific wallpaper, serial number prefix, keychain initials"
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:bg-white focus:border-blue-500 outline-none"
-            />
-          </div>
         </div>
 
-        {/* Photographs */}
-        <div className="space-y-4 pt-4 border-t border-slate-100">
-          <h2 className="text-base font-bold text-slate-900">3. Photographs (Optional)</h2>
-          <p className="text-xs text-slate-500">
-            Upload photographs of the item or similar reference photos. Visual features are extracted automatically to assist AI similarity matching.
-          </p>
+        {/* Photographs & Computer Vision Feature Extraction */}
+        <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+          <div>
+            <h2 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
+              3. Item Photographs (Recommended)
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              Uploading a reference photo computes a 128-dimensional perceptual feature vector to automatically discover matching found items.
+            </p>
+          </div>
+
           <ImageUploader
-            onImagesChange={(paths, embs) => {
+            onUploadComplete={(paths, embs) => {
               setImagePaths(paths);
-              setEmbeddings(embs || []);
+              setEmbeddings(embs);
             }}
-            maxFiles={3}
-            required={false}
           />
         </div>
 
-        {/* Submit */}
-        <div className="pt-4 border-t border-slate-100">
+        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3.5 bg-red-600 hover:bg-red-500 text-white rounded-xl font-bold text-sm shadow-md shadow-red-600/30 transition transform hover:-translate-y-0.5 disabled:opacity-50"
+            className="w-full sm:w-auto px-8 py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs sm:text-sm rounded-2xl shadow-xl shadow-rose-600/30 transition transform hover:-translate-y-0.5 disabled:opacity-50"
           >
-            {isSubmitting ? 'Publishing Report...' : 'Publish Lost Item Report'}
+            {isSubmitting ? 'Registering Lost Report & Vector...' : 'Submit Lost Item Report'}
           </button>
         </div>
 
       </form>
+
     </div>
   );
 };

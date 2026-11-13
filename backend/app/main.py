@@ -21,6 +21,32 @@ from backend.app.api.safety import router as safety_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # If running on Vercel and using fallback SQLite, copy seed DB from repo if /tmp/back2you.db is missing
+    if os.getenv("VERCEL") and settings.DATABASE_URL.startswith("sqlite:////tmp"):
+        root_db = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "back2you.db")
+        tmp_db = "/tmp/back2you.db"
+        if os.path.exists(root_db) and not os.path.exists(tmp_db):
+            import shutil
+            try:
+                shutil.copyfile(root_db, tmp_db)
+            except Exception:
+                pass
+
+    # If running on Vercel, ensure demo uploads are available in /tmp/uploads
+    if os.getenv("VERCEL") and settings.UPLOAD_DIR == "/tmp/uploads":
+        os.makedirs("/tmp/uploads", exist_ok=True)
+        repo_uploads = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
+        if os.path.exists(repo_uploads):
+            import shutil
+            for item in os.listdir(repo_uploads):
+                s = os.path.join(repo_uploads, item)
+                d = os.path.join("/tmp/uploads", item)
+                if os.path.isfile(s) and not os.path.exists(d):
+                    try:
+                        shutil.copyfile(s, d)
+                    except Exception:
+                        pass
+
     # Initialize DB & Seed locations
     init_db()
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)

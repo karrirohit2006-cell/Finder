@@ -8,7 +8,8 @@ class Settings:
     API_V1_STR: str = "/api/v1"
     
     # Database
-    DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./back2you.db")
+    default_db: str = "sqlite:////tmp/back2you.db" if os.getenv("VERCEL") else "sqlite:///./back2you.db"
+    DATABASE_URL: str = os.getenv("DATABASE_URL", default_db)
     
     # Security
     SECRET_KEY: str = os.getenv("SECRET_KEY", "super-secret-back2you-production-key-2026-lpu-lost-found")
@@ -16,7 +17,8 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))  # 24 hours
     
     # Uploads
-    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads"))
+    default_uploads_dir: str = "/tmp/uploads" if os.getenv("VERCEL") else os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "uploads")
+    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", default_uploads_dir)
     MAX_FILE_SIZE_MB: int = 10
     ALLOWED_IMAGE_TYPES: List[str] = ["image/jpeg", "image/png", "image/webp", "image/jpg"]
     
